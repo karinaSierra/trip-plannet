@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:name=".TripPlannerApp"
+        android:allowBackup="true"
+        android:icon="@android:drawable/sym_def_app_icon"
+        android:label="TripPlanner"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.TripPlanner">
+
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.register.RegisterActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.triplist.TripListActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.tripdetail.TripDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.tripform.TripFormActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.itemform.ItemFormActivity"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
+

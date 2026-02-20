@@ -27,4 +27,7 @@ public interface TripDao {
 
     @Query("SELECT * FROM trips WHERE user_id = :userId ORDER BY start_date DESC")
     List<TripEntity> getTripsByUserId(int userId);
+
+    @Query("SELECT * FROM trips WHERE id = :tripId LIMIT 1")
+    TripEntity getTripById(long tripId);
 }

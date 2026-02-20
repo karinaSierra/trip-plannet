@@ -42,6 +42,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             "tripplanner_db"
                     )
                             .fallbackToDestructiveMigration()
+                            .allowMainThreadQueries()
                             .build();
                 }
             }

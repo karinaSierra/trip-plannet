@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#F5F5F5</color>
+    <!-- Primario (Marca) - Botones principales, AppBar, FAB, iconos activos -->
+    <color name="primary_teal">#0F766E</color>
+    <color name="teal_light">#14B8A6</color>
+    <color name="teal_dark">#0B5E58</color>
+
+    <!-- Secundario (Acento) - Acciones importantes, estados destacados -->
+    <color name="accent_orange">#F97316</color>
+    <color name="orange_light">#FB923C</color>
+    <color name="orange_dark">#EA580C</color>
+
+    <!-- Neutros (UI limpia) -->
+    <color name="background_light">#F5F5F5</color>
+    <color name="white">#FFFFFF</color>
     <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="border_divider">#E0E0E0</color>
+
+    <!-- Compatibilidad con nombres ya usados en el proyecto -->
+    <color name="background">@color/background_light</color>
 </resources>

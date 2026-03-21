@@ -73,5 +73,13 @@
             android:layout_marginTop="28dp"
             android:text="Guardar" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBack"
+            style="@style/Widget.TripPlanner.Button.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Volver" />
+
     </LinearLayout>
 </ScrollView>

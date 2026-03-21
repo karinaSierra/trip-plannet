@@ -17,6 +17,7 @@ import com.example.tripplanner.data.repository.TripRepository;
 import com.example.tripplanner.data.session.SessionManager;
 import com.example.tripplanner.ui.base.BaseActivity;
 import com.example.tripplanner.ui.login.LoginActivity;
+import com.example.tripplanner.ui.tripdetail.TripDetailActivity;
 import com.example.tripplanner.ui.tripform.TripFormActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.tripplanner.viewmodel.TripListViewModel;
@@ -59,8 +60,8 @@ public class TripListActivity extends BaseActivity {
         adapter = new TripAdapter();
         adapter.setOnTripActionListener(this::onDeleteTrip);
         adapter.setOnTripClickListener(trip -> {
-            Intent intent = new Intent(TripListActivity.this, TripFormActivity.class);
-            intent.putExtra(TripFormActivity.EXTRA_TRIP_ID, trip.getId());
+            Intent intent = new Intent(TripListActivity.this, TripDetailActivity.class);
+            intent.putExtra(TripDetailActivity.EXTRA_TRIP_ID, trip.getId());
             startActivity(intent);
         });
         recyclerTrips.setAdapter(adapter);
@@ -72,9 +73,17 @@ public class TripListActivity extends BaseActivity {
 
         Button btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> {
-            sessionManager.logout();
-            startActivity(new Intent(TripListActivity.this, LoginActivity.class));
-            finish();
+            new AlertDialog.Builder(this)
+                    .setTitle("Cerrar sesión")
+                    .setMessage("¿Deseas cerrar sesión?")
+                    .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                    .setPositiveButton("Confirmar", (dialog, which) -> {
+                        sessionManager.logout();
+                        Intent intent = new Intent(TripListActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    })
+                    .show();
         });
 
         loadTrips();

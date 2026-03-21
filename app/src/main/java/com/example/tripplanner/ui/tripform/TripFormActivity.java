@@ -52,6 +52,7 @@ public class TripFormActivity extends BaseActivity {
         etStartDate = findViewById(R.id.etStartDate);
         etEndDate = findViewById(R.id.etEndDate);
         btnSave = findViewById(R.id.btnSaveTrip);
+        Button btnBack = findViewById(R.id.btnBack);
 
         long tripId = getIntent().getLongExtra(EXTRA_TRIP_ID, -1L);
         if (tripId >= 0) {
@@ -66,6 +67,7 @@ public class TripFormActivity extends BaseActivity {
         }
 
         btnSave.setOnClickListener(v -> saveTrip());
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void saveTrip() {

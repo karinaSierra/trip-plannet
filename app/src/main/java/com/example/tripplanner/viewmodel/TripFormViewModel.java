@@ -51,15 +51,57 @@ public class TripFormViewModel extends BaseViewModel {
      * Parsea una fecha en formato dd/MM/yyyy a timestamp en milis.
      */
     public long parseDate(String dateStr) {
+        return parseDateFlexible(dateStr);
+    }
+
+    /**
+     * Intenta varios formatos habituales (evita fallos silenciosos al editar).
+     */
+    private long parseDateFlexible(String dateStr) {
         if (dateStr == null || dateStr.trim().isEmpty()) {
             return 0L;
         }
+        String s = dateStr.trim();
+        String[] patterns = {
+                DATE_FORMAT,
+                "d/M/yyyy",
+                "dd/M/yyyy",
+                "d/MM/yyyy",
+                "yyyy-MM-dd",
+                "dd-MM-yyyy",
+                "d-M-yyyy"
+        };
+        for (String pattern : patterns) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.getDefault());
+                sdf.setLenient(false);
+                return sdf.parse(s).getTime();
+            } catch (Exception ignored) {
+                // siguiente patrón
+            }
+        }
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
-            return sdf.parse(dateStr.trim()).getTime();
+            sdf.setLenient(true);
+            return sdf.parse(s).getTime();
         } catch (Exception e) {
             return 0L;
         }
+    }
+
+    /**
+     * En edición: si el campo está vacío o el texto no se puede parsear, conserva la fecha anterior.
+     * Así no se pierden fechas al fallar el parseo o al dejar el campo en blanco por error.
+     */
+    private long resolveDateForEdit(String input, long previous) {
+        if (input == null || input.trim().isEmpty()) {
+            return previous;
+        }
+        long parsed = parseDateFlexible(input);
+        if (parsed == 0L) {
+            return previous;
+        }
+        return parsed;
     }
 
     /**
@@ -73,8 +115,10 @@ public class TripFormViewModel extends BaseViewModel {
         if (currentTrip != null) {
             currentTrip.setTitle(title.trim());
             currentTrip.setDestination(destination != null ? destination.trim() : "");
-            currentTrip.setStartDate(parseDate(startDateStr));
-            currentTrip.setEndDate(parseDate(endDateStr));
+            long newStart = resolveDateForEdit(startDateStr, currentTrip.getStartDate());
+            long newEnd = resolveDateForEdit(endDateStr, currentTrip.getEndDate());
+            currentTrip.setStartDate(newStart);
+            currentTrip.setEndDate(newEnd);
             int rows = tripRepository.update(currentTrip);
             return rows > 0 ? currentTrip.getId() : 0L;
         } else {
@@ -83,8 +127,8 @@ public class TripFormViewModel extends BaseViewModel {
             trip.setTitle(title.trim());
             trip.setDestination(destination != null ? destination.trim() : "");
             trip.setDescription("");
-            trip.setStartDate(parseDate(startDateStr));
-            trip.setEndDate(parseDate(endDateStr));
+            trip.setStartDate(parseDateFlexible(startDateStr));
+            trip.setEndDate(parseDateFlexible(endDateStr));
             return tripRepository.insert(trip);
         }
     }

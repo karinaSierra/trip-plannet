@@ -21,6 +21,7 @@ import com.google.android.material.button.MaterialButton;
 
 /**
  * Pantalla que muestra el detalle de un viaje concreto.
+ * Recarga datos en onResume para reflejar cambios al volver del formulario de edición.
  */
 public class TripDetailActivity extends BaseActivity {
 
@@ -28,13 +29,19 @@ public class TripDetailActivity extends BaseActivity {
 
     private TripDetailViewModel viewModel;
     private TripEntity currentTrip;
+    private long tripId = -1L;
+
+    private TextView tvTitle;
+    private TextView tvDestination;
+    private TextView tvStartDate;
+    private TextView tvEndDate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_detail);
 
-        long tripId = getIntent().getLongExtra(EXTRA_TRIP_ID, -1L);
+        tripId = getIntent().getLongExtra(EXTRA_TRIP_ID, -1L);
         if (tripId < 0) {
             Toast.makeText(this, "Viaje no encontrado", Toast.LENGTH_SHORT).show();
             finish();
@@ -46,34 +53,47 @@ public class TripDetailActivity extends BaseActivity {
         viewModel = new ViewModelProvider(this,
                 new TripDetailViewModelFactory(tripRepository)).get(TripDetailViewModel.class);
 
-        TextView tvTitle = findViewById(R.id.tvTitle);
-        TextView tvDestination = findViewById(R.id.tvDestination);
-        TextView tvStartDate = findViewById(R.id.tvStartDate);
-        TextView tvEndDate = findViewById(R.id.tvEndDate);
+        tvTitle = findViewById(R.id.tvTitle);
+        tvDestination = findViewById(R.id.tvDestination);
+        tvStartDate = findViewById(R.id.tvStartDate);
+        tvEndDate = findViewById(R.id.tvEndDate);
         MaterialButton btnEdit = findViewById(R.id.btnEditTrip);
         MaterialButton btnDelete = findViewById(R.id.btnDeleteTrip);
         MaterialButton btnBack = findViewById(R.id.btnBack);
 
+        btnEdit.setOnClickListener(v -> {
+            Intent intent = new Intent(TripDetailActivity.this, TripFormActivity.class);
+            intent.putExtra(TripFormActivity.EXTRA_TRIP_ID, tripId);
+            startActivity(intent);
+        });
+
+        btnDelete.setOnClickListener(v -> showDeleteConfirmation());
+        btnBack.setOnClickListener(v -> finish());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (tripId >= 0) {
+            refreshTripFromDatabase();
+        }
+    }
+
+    /**
+     * Vuelve a leer el viaje desde Room para mostrar título/fechas actualizados
+     * (p. ej. tras editar en TripFormActivity y volver con finish()).
+     */
+    private void refreshTripFromDatabase() {
         currentTrip = viewModel.getTripById(tripId);
         if (currentTrip == null) {
             Toast.makeText(this, "Viaje no encontrado", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-
         tvTitle.setText(currentTrip.getTitle());
-        tvDestination.setText(currentTrip.getDestination());
+        tvDestination.setText(currentTrip.getDestination() != null ? currentTrip.getDestination() : "");
         tvStartDate.setText("Inicio: " + viewModel.formatDate(currentTrip.getStartDate()));
         tvEndDate.setText("Fin: " + viewModel.formatDate(currentTrip.getEndDate()));
-
-        btnEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(TripDetailActivity.this, TripFormActivity.class);
-            intent.putExtra(TripFormActivity.EXTRA_TRIP_ID, currentTrip.getId());
-            startActivity(intent);
-        });
-
-        btnDelete.setOnClickListener(v -> showDeleteConfirmation());
-        btnBack.setOnClickListener(v -> finish());
     }
 
     private void showDeleteConfirmation() {
@@ -90,5 +110,3 @@ public class TripDetailActivity extends BaseActivity {
                 .show();
     }
 }
-
-

@@ -38,10 +38,6 @@
             android:name=".ui.tripform.TripFormActivity"
             android:exported="false" />
 
-        <activity
-            android:name=".ui.itemform.ItemFormActivity"
-            android:exported="false" />
-
     </application>
 
 </manifest>

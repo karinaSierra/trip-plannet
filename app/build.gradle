@@ -53,3 +53,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
 
+// Alias para IDEs o scripts que ejecutan :app:testClasses (tarea típica de proyectos Java).
+// En Android la tarea real de tests unitarios es testDebugUnitTest.
+tasks.register('testClasses') {
+    dependsOn 'testDebugUnitTest'
+    group = 'verification'
+    description = 'Alias de testDebugUnitTest para compatibilidad con la convención testClasses.'
+}
+

@@ -1,6 +1,6 @@
 # TripPlanner
 
-Aplicación Android nativa para **planificar viajes**: registro e inicio de sesión local, gestión de viajes (CRUD) y detalle con acciones contextuales. Desarrollada en **Java** con arquitectura **MVVM** y persistencia **Room**.
+Aplicación Android nativa para **planificar viajes**: permite registro e inicio de sesión local, crear, editar y eliminar viajes, y ver el detalle de cada uno con acciones directas (por ejemplo Editar, Eliminar o Volver). Desarrollada en **Java** con arquitectura **MVVM** y persistencia local con **Room**.
 
 ---
 
@@ -9,6 +9,36 @@ Aplicación Android nativa para **planificar viajes**: registro e inicio de sesi
 - **Android Studio** (recomendado: última versión estable)
 - **JDK 17** (según `app/build.gradle`)
 - **minSdk 23** · **targetSdk 35** · **compileSdk 35**
+
+---
+
+## Versión de Java usada
+
+El proyecto está configurado con **Java 17 (LTS)**:
+
+- `sourceCompatibility JavaVersion.VERSION_17`
+- `targetCompatibility JavaVersion.VERSION_17`
+
+### ¿Por qué Java 17 y no Java 21 en Android?
+
+- **Compatibilidad oficial más sólida** con Android Gradle Plugin y toolchain actual.
+- **Menos fricción en build** (plugins, kapt/annotationProcessor, Room, etc.).
+- **Soporte LTS** maduro, estable y muy adoptado en proyectos Android en producción.
+
+### Ventajas prácticas de Java 17 en esta app
+
+- Mejoras de lenguaje (switch expressions, records/sealed en contextos compatibles, text blocks).
+- Buen equilibrio entre **modernidad y estabilidad**.
+- Menor riesgo de errores de entorno en equipos diferentes.
+
+### Uso recomendado en tu entorno
+
+1. Instala **JDK 17**.
+2. Configura `JAVA_HOME` apuntando a la raíz del JDK (no a `bin`).
+3. En Android Studio, selecciona Gradle JDK 17:
+   - `File > Settings > Build, Execution, Deployment > Build Tools > Gradle`.
+
+> Si en el futuro Android/AGP de tu proyecto soporta Java 21 de forma completa para tu stack, se puede migrar sin problema.
 
 ---
 
@@ -22,6 +52,16 @@ Si hay errores de compilación:
 
 - **Build → Clean Project** y luego **Build → Rebuild Project**.
 - Comprueba que `JAVA_HOME` apunte a la raíz del JDK (no a la carpeta `bin`).
+
+### Compilar y tests desde terminal
+
+| Objetivo | Comando (Windows) |
+|----------|-------------------|
+| Compilar APK debug | `gradlew.bat assembleDebug` |
+| Tests unitarios (debug) | `gradlew.bat testDebugUnitTest` |
+| Alias `testClasses` | `gradlew.bat :app:testClasses` (redirige a `testDebugUnitTest`) |
+
+En proyectos Android **no** existe la tarea estándar `testClasses` del plugin `java`; este proyecto define un **alias** en `app/build.gradle` para que herramientas que la invoquen no fallen.
 
 ---
 
@@ -70,7 +110,7 @@ com.example.tripplanner
 │   │   ├── dao/          # UserDao, TripDao, ItemDao
 │   │   ├── db/           # AppDatabase
 │   │   └── entity/       # UserEntity, TripEntity, ItemEntity
-│   ├── repository/       # UserRepository, TripRepository, ItemRepository
+│   ├── repository/       # UserRepository, TripRepository
 │   └── session/          # SessionManager
 ├── ui
 │   ├── base/             # BaseActivity
@@ -79,8 +119,7 @@ com.example.tripplanner
 │   ├── register/
 │   ├── triplist/         # TripListActivity, TripAdapter
 │   ├── tripdetail/
-│   ├── tripform/
-│   └── itemform/
+│   └── tripform/
 └── viewmodel/            # ViewModels y factories
 ```
 

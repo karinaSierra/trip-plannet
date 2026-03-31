@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.tripplanner.data.local.entity.UserEntity;
 import com.example.tripplanner.data.repository.UserRepository;
+import com.example.tripplanner.security.PasswordHasher;
 import com.example.tripplanner.viewmodel.base.BaseViewModel;
 
 /**
@@ -55,7 +56,7 @@ public class RegisterViewModel extends BaseViewModel {
         UserEntity user = new UserEntity();
         user.setName(name.trim());
         user.setEmail(email.trim());
-        user.setPasswordHash(password);
+        user.setPasswordHash(PasswordHasher.hash(password));
 
         long id = userRepository.register(user);
         if (id > 0) {

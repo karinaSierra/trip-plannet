@@ -7,38 +7,30 @@ Aplicación Android nativa para **planificar viajes**: permite registro e inicio
 ## Requisitos
 
 - **Android Studio** (recomendado: última versión estable)
-- **JDK 17** (según `app/build.gradle`)
+- **JDK 21** (según `app/build.gradle`)
 - **minSdk 23** · **targetSdk 35** · **compileSdk 35**
 
 ---
 
 ## Versión de Java usada
 
-El proyecto está configurado con **Java 17 (LTS)**:
+El proyecto está configurado con **Java 21 (LTS)**:
 
-- `sourceCompatibility JavaVersion.VERSION_17`
-- `targetCompatibility JavaVersion.VERSION_17`
+- `sourceCompatibility JavaVersion.VERSION_21`
+- `targetCompatibility JavaVersion.VERSION_21`
 
-### ¿Por qué Java 17 y no Java 21 en Android?
+### Por qué Java 21
 
-- **Compatibilidad oficial más sólida** con Android Gradle Plugin y toolchain actual.
-- **Menos fricción en build** (plugins, kapt/annotationProcessor, Room, etc.).
-- **Soporte LTS** maduro, estable y muy adoptado en proyectos Android en producción.
-
-### Ventajas prácticas de Java 17 en esta app
-
-- Mejoras de lenguaje (switch expressions, records/sealed en contextos compatibles, text blocks).
-- Buen equilibrio entre **modernidad y estabilidad**.
-- Menor riesgo de errores de entorno en equipos diferentes.
+- **Android Gradle Plugin 8.x** admite **Java 21** como lenguaje de compilación (`compileOptions`) en proyectos Android actuales.
+- **LTS** con mejoras recientes (pattern matching, records, virtual threads en el JDK, etc.) donde el toolchain lo permita.
+- Alineado con el **JDK embebido (JBR)** de Android Studio reciente, que suele ser 17 u **21** según la versión del IDE.
 
 ### Uso recomendado en tu entorno
 
-1. Instala **JDK 17**.
+1. Instala **JDK 21** (o usa el **JBR 21** que incluye Android Studio si coincide con tu versión).
 2. Configura `JAVA_HOME` apuntando a la raíz del JDK (no a `bin`).
-3. En Android Studio, selecciona Gradle JDK 17:
+3. En Android Studio, selecciona un **Gradle JDK** compatible (21 recomendado):
    - `File > Settings > Build, Execution, Deployment > Build Tools > Gradle`.
-
-> Si en el futuro Android/AGP de tu proyecto soporta Java 21 de forma completa para tu stack, se puede migrar sin problema.
 
 ---
 
@@ -51,7 +43,8 @@ El proyecto está configurado con **Java 17 (LTS)**:
 Si hay errores de compilación:
 
 - **Build → Clean Project** y luego **Build → Rebuild Project**.
-- Comprueba que `JAVA_HOME` apunte a la raíz del JDK (no a la carpeta `bin`).
+- Comprueba que `JAVA_HOME` apunte a la **raíz del JDK** (por ejemplo `...\jdk-21`, no `...\jdk-21\bin`). Si apunta a `bin`, Gradle fallará al arrancar.
+- Usa un **JDK 21** (o el JBR 21 de Android Studio) coherente con `compileOptions` del módulo `app`.
 
 ### Compilar y tests desde terminal
 

@@ -3,6 +3,7 @@ package com.example.tripplanner.data.repository;
 import com.example.tripplanner.data.local.dao.UserDao;
 import com.example.tripplanner.data.local.db.AppDatabase;
 import com.example.tripplanner.data.local.entity.UserEntity;
+import com.example.tripplanner.security.PasswordHasher;
 
 /**
  * Repositorio de usuarios. Delega en UserDao.
@@ -20,7 +21,19 @@ public class UserRepository {
     }
 
     public UserEntity login(String email, String password) {
-        return userDao.login(email, password);
+        UserEntity user = userDao.getUserByEmail(email);
+        if (user == null) {
+            return null;
+        }
+        String stored = user.getPasswordHash();
+        if (!PasswordHasher.verify(password, stored)) {
+            return null;
+        }
+        if (PasswordHasher.needsMigration(stored)) {
+            user.setPasswordHash(PasswordHasher.hash(password));
+            userDao.update(user);
+        }
+        return user;
     }
 
     public UserEntity getUserById(int id) {

@@ -2,6 +2,9 @@ package com.example.tripplanner.ui.tripdetail;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,7 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.tripplanner.R;
 import com.example.tripplanner.data.local.db.AppDatabase;
+import com.example.tripplanner.data.local.entity.ItemEntity;
 import com.example.tripplanner.data.local.entity.TripEntity;
+import com.example.tripplanner.data.repository.ItemRepository;
 import com.example.tripplanner.data.repository.TripRepository;
 import com.example.tripplanner.ui.base.BaseActivity;
 import com.example.tripplanner.ui.tripform.TripFormActivity;
@@ -35,6 +40,8 @@ public class TripDetailActivity extends BaseActivity {
     private TextView tvDestination;
     private TextView tvStartDate;
     private TextView tvEndDate;
+    private TextView tvChecklistEmpty;
+    private LinearLayout itemsContainer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,13 +57,17 @@ public class TripDetailActivity extends BaseActivity {
 
         AppDatabase db = AppDatabase.getInstance(this);
         TripRepository tripRepository = new TripRepository(db);
+        ItemRepository itemRepository = new ItemRepository(db);
         viewModel = new ViewModelProvider(this,
-                new TripDetailViewModelFactory(tripRepository)).get(TripDetailViewModel.class);
+                new TripDetailViewModelFactory(tripRepository, itemRepository))
+                .get(TripDetailViewModel.class);
 
         tvTitle = findViewById(R.id.tvTitle);
         tvDestination = findViewById(R.id.tvDestination);
         tvStartDate = findViewById(R.id.tvStartDate);
         tvEndDate = findViewById(R.id.tvEndDate);
+        tvChecklistEmpty = findViewById(R.id.tvChecklistEmpty);
+        itemsContainer = findViewById(R.id.itemsContainer);
         MaterialButton btnEdit = findViewById(R.id.btnEditTrip);
         MaterialButton btnDelete = findViewById(R.id.btnDeleteTrip);
         MaterialButton btnBack = findViewById(R.id.btnBack);
@@ -76,6 +87,8 @@ public class TripDetailActivity extends BaseActivity {
         super.onResume();
         if (tripId >= 0) {
             refreshTripFromDatabase();
+            viewModel.createDefaultChecklistIfEmpty(tripId);
+            renderChecklist();
         }
     }
 
@@ -108,5 +121,28 @@ public class TripDetailActivity extends BaseActivity {
                     finish();
                 })
                 .show();
+    }
+
+    private void renderChecklist() {
+        itemsContainer.removeAllViews();
+        java.util.List<ItemEntity> items = viewModel.getItemsByTripId(tripId);
+        if (items.isEmpty()) {
+            tvChecklistEmpty.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        tvChecklistEmpty.setVisibility(View.GONE);
+        for (ItemEntity item : items) {
+            CheckBox checkBox = new CheckBox(this);
+            checkBox.setText(item.getName());
+            checkBox.setChecked(item.isCompleted());
+            checkBox.setTextSize(15f);
+            checkBox.setPadding(0, 8, 0, 8);
+            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                item.setCompleted(isChecked);
+                viewModel.updateItem(item);
+            });
+            itemsContainer.addView(checkBox);
+        }
     }
 }

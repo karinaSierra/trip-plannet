@@ -11,10 +11,9 @@ import com.example.tripplanner.R;
 import com.example.tripplanner.data.session.SessionManager;
 import com.example.tripplanner.ui.base.BaseActivity;
 import com.example.tripplanner.ui.login.LoginActivity;
-import com.example.tripplanner.ui.triplist.TripListActivity;
 
 /**
- * Pantalla inicial: muestra el logo y redirige a Login o a la lista de viajes si ya hay sesión.
+ * Pantalla inicial: muestra el logo y redirige siempre a Login.
  */
 public class SplashActivity extends BaseActivity {
 
@@ -30,9 +29,9 @@ public class SplashActivity extends BaseActivity {
 
     private void goNext() {
         SessionManager sessionManager = new SessionManager(this);
-        Intent intent = sessionManager.isLoggedIn()
-                ? new Intent(this, TripListActivity.class)
-                : new Intent(this, LoginActivity.class);
+        // Forzamos autenticación en cada apertura de app.
+        sessionManager.logout();
+        Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
     }

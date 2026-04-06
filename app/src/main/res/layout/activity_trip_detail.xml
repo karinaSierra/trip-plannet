@@ -49,6 +49,32 @@
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/tvChecklistTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Checklist del viaje"
+            android:textColor="@color/primary_teal"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvChecklistEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="No hay tareas aún."
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/itemsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

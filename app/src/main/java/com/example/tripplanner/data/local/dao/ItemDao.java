@@ -26,5 +26,5 @@ public interface ItemDao {
     int delete(ItemEntity item);
 
     @Query("SELECT * FROM items WHERE trip_id = :tripId ORDER BY id ASC")
-    List<ItemEntity> getItemsByTripId(int tripId);
+    List<ItemEntity> getItemsByTripId(long tripId);
 }

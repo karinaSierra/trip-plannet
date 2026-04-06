@@ -1,6 +1,6 @@
 # TripPlanner
 
-Aplicación Android nativa para **planificar viajes**: permite registro e inicio de sesión local, crear, editar y eliminar viajes, y ver el detalle de cada uno con acciones directas (por ejemplo Editar, Eliminar o Volver). Desarrollada en **Java** con arquitectura **MVVM** y persistencia local con **Room**.
+Aplicación Android nativa para **planificar viajes**: registro e inicio de sesión local, crear, editar y eliminar viajes, detalle con checklist de tareas (tabla `items`) y acciones Editar, Eliminar o Volver. Las contraseñas se guardan **hasheadas** (PBKDF2), no en texto plano. Desarrollada en **Java** con arquitectura **MVVM** y persistencia local con **Room**.
 
 ---
 
@@ -66,6 +66,7 @@ En proyectos Android **no** existe la tarea estándar `testClasses` del plugin `
 | **ViewModel** | Lógica de presentación y estado (`viewmodel/…`) |
 | **Data** | Room: entidades, DAOs, `AppDatabase`; repositorios que delegan en DAOs |
 | **Sesión** | `SessionManager` (SharedPreferences): usuario logueado |
+| **Seguridad** | `PasswordHasher`: PBKDF2-HMAC-SHA256 para el campo `password_hash` |
 
 No hay backend remoto: todo es **local** en el dispositivo.
 
@@ -83,13 +84,13 @@ No hay backend remoto: todo es **local** en el dispositivo.
 
 ## Flujo de pantallas
 
-1. **Splash** → logo y redirección a login o lista según sesión.
-2. **Login / Registro** → validación mínima y datos en Room.
+1. **Splash** → logo y **siempre** redirección a **Login** (la sesión previa se limpia al abrir la app para exigir autenticación).
+2. **Login / Registro** → validación mínima; usuarios en Room; contraseña almacenada como hash.
 3. **Lista de viajes** → RecyclerView, FAB para nuevo viaje, cerrar sesión con confirmación.
-4. **Detalle de viaje** → datos del viaje; editar, eliminar (con diálogo) o volver.
+4. **Detalle de viaje** → datos del viaje; **checklist** de tareas (`items`) con casillas; la primera vez se crean tareas por defecto si el viaje no tenía ítems; editar, eliminar (con diálogo) o volver.
 5. **Formulario de viaje** → crear o editar viaje; guardar o volver.
 
-La sesión se guarda con `SessionManager` tras un login correcto. Al cerrar sesión se limpia la sesión y se navega al login sin poder volver atrás a la lista (flags de intent).
+Tras un login correcto, `SessionManager` guarda la sesión. Al cerrar sesión se limpia y se navega al login sin poder volver atrás a la lista (flags de intent).
 
 ---
 
@@ -103,8 +104,9 @@ com.example.tripplanner
 │   │   ├── dao/          # UserDao, TripDao, ItemDao
 │   │   ├── db/           # AppDatabase
 │   │   └── entity/       # UserEntity, TripEntity, ItemEntity
-│   ├── repository/       # UserRepository, TripRepository
+│   ├── repository/       # UserRepository, TripRepository, ItemRepository
 │   └── session/          # SessionManager
+├── security/             # PasswordHasher (PBKDF2)
 ├── ui
 │   ├── base/             # BaseActivity
 │   ├── splash/
@@ -124,6 +126,8 @@ com.example.tripplanner
 - **Singleton:** `AppDatabase.getInstance(Context)`
 - **Migraciones:** `fallbackToDestructiveMigration()` (desarrollo; en producción conviene migraciones reales)
 - **Consultas en hilo principal:** `allowMainThreadQueries()` (simplifica el código; en producción suele usarse Executor/coroutines)
+
+**Tablas principales:** `users` (credenciales; `password_hash` contiene un string PBKDF2, no la contraseña en claro), `trips`, **`items`** (tareas del checklist ligadas a `trip_id`: nombre, descripción, `completed`).
 
 Las fechas de viaje se guardan como **`long`** (milisegundos), patrón habitual en Room/SQLite.
 

@@ -14,20 +14,20 @@ Aplicación Android nativa para **planificar viajes**: registro e inicio de sesi
 
 ## Versión de Java usada
 
-El proyecto está configurado con **Java 21 (LTS)**:
+El proyecto está configurado con **Java 21**:
 
 - `sourceCompatibility JavaVersion.VERSION_21`
 - `targetCompatibility JavaVersion.VERSION_21`
 
-### Por qué Java 21
+### Notas de compatibilidad para Java 21
 
-- **Android Gradle Plugin 8.x** admite **Java 21** como lenguaje de compilación (`compileOptions`) en proyectos Android actuales.
-- **LTS** con mejoras recientes (pattern matching, records, virtual threads en el JDK, etc.) donde el toolchain lo permita.
-- Alineado con el **JDK embebido (JBR)** de Android Studio reciente, que suele ser 17 u **21** según la versión del IDE.
+- Java 21 es una configuración estable para este proyecto con AGP 8.x.
+- Puedes compilar con un JDK 21 instalado en tu sistema o con JBR 21 de Android Studio.
+- Si aparece un error tipo `invalid source release`, revisa que el Gradle JDK seleccionado sea 21.
 
 ### Uso recomendado en tu entorno
 
-1. Instala **JDK 21** (o usa el **JBR 21** que incluye Android Studio si coincide con tu versión).
+1. Instala **JDK 21** en tu sistema.
 2. Configura `JAVA_HOME` apuntando a la raíz del JDK (no a `bin`).
 3. En Android Studio, selecciona un **Gradle JDK** compatible (21 recomendado):
    - `File > Settings > Build, Execution, Deployment > Build Tools > Gradle`.
@@ -44,7 +44,7 @@ Si hay errores de compilación:
 
 - **Build → Clean Project** y luego **Build → Rebuild Project**.
 - Comprueba que `JAVA_HOME` apunte a la **raíz del JDK** (por ejemplo `...\jdk-21`, no `...\jdk-21\bin`). Si apunta a `bin`, Gradle fallará al arrancar.
-- Usa un **JDK 21** (o el JBR 21 de Android Studio) coherente con `compileOptions` del módulo `app`.
+- Usa un **JDK 21** coherente con `compileOptions` del módulo `app`.
 
 ### Compilar y tests desde terminal
 
@@ -98,7 +98,6 @@ Tras un login correcto, `SessionManager` guarda la sesión. Al cerrar sesión se
 
 ```
 com.example.tripplanner
-├── TripPlannerApp.java
 ├── data
 │   ├── local
 │   │   ├── dao/          # UserDao, TripDao, ItemDao

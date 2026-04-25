@@ -1,0 +1,7 @@
+{
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "settings.gradle": "build.gradle, gradle.properties, gradlew, gradlew.bat, local.properties, .gitignore, README.md, gradle/"
+  }
+}

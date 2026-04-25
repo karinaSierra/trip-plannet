@@ -58,6 +58,52 @@ En proyectos Android **no** existe la tarea estándar `testClasses` del plugin `
 
 ---
 
+## Cómo crear un dispositivo virtual (emulador) en Android Studio
+
+Usa el **Device Manager** integrado de Android Studio para crear un teléfono virtual y correr la app sin necesidad de un celular físico.
+
+### Pasos
+
+1. Abre Android Studio con el proyecto cargado.
+2. Ve a **View → Tool Windows → Device Manager** (o haz clic en el icono de teléfono en la barra lateral derecha).
+3. Pulsa **Create Device** (o el botón **+**).
+4. **Selecciona el hardware:**
+   - Categoría **Phone**.
+   - Recomendado: **Pixel 6** o **Pixel 7** (resolución y tamaño realistas).
+   - Pulsa **Next**.
+5. **Selecciona la imagen del sistema (System Image):**
+   - Recomendado: **API 34 (Android 14)** o **API 35** para coincidir con `targetSdk 35`.
+   - Si la imagen aún no está descargada, pulsa **Download** junto a la versión y espera.
+   - Pulsa **Next**.
+6. **Configuración del AVD:**
+   - Asigna un nombre, por ejemplo `Pixel_7_API_34`.
+   - Orientación **Portrait**.
+   - Deja el resto por defecto.
+   - Pulsa **Finish**.
+7. En **Device Manager** verás tu emulador. Pulsa el botón **▶ (Play)** para iniciarlo.
+8. Cuando el emulador esté encendido, en la barra superior selecciónalo como dispositivo destino y pulsa **Run 'app'** (▶ verde).
+
+### Requisitos para un buen rendimiento
+
+- **Aceleración de hardware activada:**
+  - Windows: instala **Intel HAXM** (procesadores Intel) o habilita **WHPX/Hyper-V** desde *Características de Windows*.
+  - AMD: usa **Android Emulator Hypervisor Driver** (se instala desde el SDK Manager).
+- **RAM recomendada:** 8 GB o más en el equipo anfitrión.
+- En **SDK Manager** asegúrate de tener instalados:
+  - **Android Emulator**
+  - **Android SDK Platform** correspondiente (por ejemplo, API 34/35)
+  - **Intel x86 Emulator Accelerator (HAXM installer)** si aplica
+
+### Alternativa: usar un dispositivo físico
+
+1. Activa **Opciones de desarrollador** en tu celular (toca 7 veces *Número de compilación* en *Acerca del teléfono*).
+2. Activa **Depuración por USB**.
+3. Conecta el celular al PC con cable USB.
+4. Acepta el cuadro **Permitir depuración USB** en el celular.
+5. En Android Studio, selecciona el dispositivo en la lista superior y pulsa **Run 'app'**.
+
+---
+
 ## Arquitectura
 
 | Capa | Descripción |

@@ -49,15 +49,32 @@
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/tvChecklistTitle"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Checklist del viaje"
-            android:textColor="@color/primary_teal"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvChecklistTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Checklist del viaje"
+                android:textColor="@color/primary_teal"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditChecklist"
+                style="@style/Widget.TripPlanner.Button.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="16dp"
+                android:text="Editar" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvChecklistEmpty"
@@ -74,6 +91,37 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="vertical" />
+
+        <LinearLayout
+            android:id="@+id/addItemContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etNewItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_edittext_rounded"
+                android:hint="Nueva tarea"
+                android:inputType="textCapSentences"
+                android:padding="12dp"
+                android:textColor="@color/text_primary" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddItem"
+                style="@style/Widget.TripPlanner.Button.Primary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="18dp"
+                android:text="+" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

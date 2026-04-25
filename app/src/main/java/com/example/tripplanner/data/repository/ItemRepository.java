@@ -25,6 +25,10 @@ public class ItemRepository {
         return itemDao.update(item);
     }
 
+    public int delete(ItemEntity item) {
+        return itemDao.delete(item);
+    }
+
     public List<ItemEntity> getItemsByTripId(long tripId) {
         return itemDao.getItemsByTripId(tripId);
     }

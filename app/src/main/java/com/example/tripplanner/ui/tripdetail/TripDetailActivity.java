@@ -2,8 +2,12 @@ package com.example.tripplanner.ui.tripdetail;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +28,8 @@ import com.example.tripplanner.viewmodel.TripDetailViewModel;
 import com.example.tripplanner.viewmodel.TripDetailViewModelFactory;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.List;
+
 /**
  * Pantalla que muestra el detalle de un viaje concreto.
  * Recarga datos en onResume para reflejar cambios al volver del formulario de edición.
@@ -35,6 +41,7 @@ public class TripDetailActivity extends BaseActivity {
     private TripDetailViewModel viewModel;
     private TripEntity currentTrip;
     private long tripId = -1L;
+    private boolean checklistEditMode = false;
 
     private TextView tvTitle;
     private TextView tvDestination;
@@ -42,6 +49,10 @@ public class TripDetailActivity extends BaseActivity {
     private TextView tvEndDate;
     private TextView tvChecklistEmpty;
     private LinearLayout itemsContainer;
+    private LinearLayout addItemContainer;
+    private EditText etNewItem;
+    private MaterialButton btnAddItem;
+    private MaterialButton btnEditChecklist;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,6 +79,10 @@ public class TripDetailActivity extends BaseActivity {
         tvEndDate = findViewById(R.id.tvEndDate);
         tvChecklistEmpty = findViewById(R.id.tvChecklistEmpty);
         itemsContainer = findViewById(R.id.itemsContainer);
+        addItemContainer = findViewById(R.id.addItemContainer);
+        etNewItem = findViewById(R.id.etNewItem);
+        btnAddItem = findViewById(R.id.btnAddItem);
+        btnEditChecklist = findViewById(R.id.btnEditChecklist);
         MaterialButton btnEdit = findViewById(R.id.btnEditTrip);
         MaterialButton btnDelete = findViewById(R.id.btnDeleteTrip);
         MaterialButton btnBack = findViewById(R.id.btnBack);
@@ -80,6 +95,9 @@ public class TripDetailActivity extends BaseActivity {
 
         btnDelete.setOnClickListener(v -> showDeleteConfirmation());
         btnBack.setOnClickListener(v -> finish());
+
+        btnEditChecklist.setOnClickListener(v -> toggleChecklistEditMode());
+        btnAddItem.setOnClickListener(v -> addNewItem());
     }
 
     @Override
@@ -92,10 +110,6 @@ public class TripDetailActivity extends BaseActivity {
         }
     }
 
-    /**
-     * Vuelve a leer el viaje desde Room para mostrar título/fechas actualizados
-     * (p. ej. tras editar en TripFormActivity y volver con finish()).
-     */
     private void refreshTripFromDatabase() {
         currentTrip = viewModel.getTripById(tripId);
         if (currentTrip == null) {
@@ -123,9 +137,31 @@ public class TripDetailActivity extends BaseActivity {
                 .show();
     }
 
+    private void toggleChecklistEditMode() {
+        checklistEditMode = !checklistEditMode;
+        btnEditChecklist.setText(checklistEditMode ? "Listo" : "Editar");
+        addItemContainer.setVisibility(checklistEditMode ? View.VISIBLE : View.GONE);
+        renderChecklist();
+    }
+
+    private void addNewItem() {
+        String name = etNewItem.getText() != null ? etNewItem.getText().toString().trim() : "";
+        if (name.isEmpty()) {
+            Toast.makeText(this, "Escribe el nombre de la tarea", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        long inserted = viewModel.addItem(tripId, name);
+        if (inserted > 0) {
+            etNewItem.setText("");
+            renderChecklist();
+        } else {
+            Toast.makeText(this, "No se pudo agregar la tarea", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void renderChecklist() {
         itemsContainer.removeAllViews();
-        java.util.List<ItemEntity> items = viewModel.getItemsByTripId(tripId);
+        List<ItemEntity> items = viewModel.getItemsByTripId(tripId);
         if (items.isEmpty()) {
             tvChecklistEmpty.setVisibility(View.VISIBLE);
             return;
@@ -133,16 +169,73 @@ public class TripDetailActivity extends BaseActivity {
 
         tvChecklistEmpty.setVisibility(View.GONE);
         for (ItemEntity item : items) {
-            CheckBox checkBox = new CheckBox(this);
-            checkBox.setText(item.getName());
-            checkBox.setChecked(item.isCompleted());
-            checkBox.setTextSize(15f);
-            checkBox.setPadding(0, 8, 0, 8);
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                item.setCompleted(isChecked);
-                viewModel.updateItem(item);
-            });
-            itemsContainer.addView(checkBox);
+            if (checklistEditMode) {
+                itemsContainer.addView(buildEditableRow(item));
+            } else {
+                itemsContainer.addView(buildReadOnlyRow(item));
+            }
         }
+    }
+
+    private View buildReadOnlyRow(ItemEntity item) {
+        CheckBox checkBox = new CheckBox(this);
+        checkBox.setText(item.getName());
+        checkBox.setChecked(item.isCompleted());
+        checkBox.setTextSize(15f);
+        checkBox.setPadding(0, 8, 0, 8);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            item.setCompleted(isChecked);
+            viewModel.updateItem(item);
+        });
+        return checkBox;
+    }
+
+    private View buildEditableRow(ItemEntity item) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        row.setPadding(0, 8, 0, 8);
+
+        EditText editText = new EditText(this);
+        LinearLayout.LayoutParams etParams = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        editText.setLayoutParams(etParams);
+        editText.setBackgroundResource(R.drawable.bg_edittext_rounded);
+        editText.setPadding(24, 16, 24, 16);
+        editText.setText(item.getName());
+        editText.setTextSize(15f);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String newName = s.toString().trim();
+                if (!newName.isEmpty() && !newName.equals(item.getName())) {
+                    item.setName(newName);
+                    viewModel.updateItem(item);
+                }
+            }
+        });
+
+        ImageButton btnDelete = new ImageButton(this);
+        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        btnParams.setMarginStart(12);
+        btnDelete.setLayoutParams(btnParams);
+        btnDelete.setImageResource(android.R.drawable.ic_menu_delete);
+        btnDelete.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        btnDelete.setContentDescription("Eliminar tarea");
+        btnDelete.setOnClickListener(v -> {
+            viewModel.deleteItem(item);
+            renderChecklist();
+        });
+
+        row.addView(editText);
+        row.addView(btnDelete);
+        return row;
     }
 }

@@ -51,6 +51,22 @@ public class TripDetailViewModel extends BaseViewModel {
         return itemRepository.update(item);
     }
 
+    public int deleteItem(ItemEntity item) {
+        return itemRepository.delete(item);
+    }
+
+    public long addItem(long tripId, String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return -1L;
+        }
+        ItemEntity item = new ItemEntity();
+        item.setTripId(tripId);
+        item.setName(name.trim());
+        item.setDescription("");
+        item.setCompleted(false);
+        return itemRepository.insert(item);
+    }
+
     /**
      * Crea una checklist inicial solo si el viaje no tiene items.
      * @return cantidad de items creados.
